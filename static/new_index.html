@@ -1,0 +1,502 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tamil Voice Gateway</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #ffffff;
+            color: #333;
+            line-height: 1.6;
+        }
+
+        .container {
+            display: flex;
+            height: 100vh;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            width: 250px;
+            background: #f8f9fa;
+            border-right: 1px solid #e9ecef;
+            padding: 20px 0;
+        }
+
+        .logo {
+            padding: 0 20px 30px;
+            border-bottom: 1px solid #e9ecef;
+            margin-bottom: 20px;
+        }
+
+        .logo h1 {
+            font-size: 18px;
+            font-weight: 600;
+            color: #333;
+        }
+
+        .nav-tabs {
+            list-style: none;
+        }
+
+        .nav-tab {
+            padding: 12px 20px;
+            cursor: pointer;
+            border-bottom: 1px solid #f0f0f0;
+            transition: background-color 0.2s;
+        }
+
+        .nav-tab:hover {
+            background: #f0f0f0;
+        }
+
+        .nav-tab.active {
+            background: #000;
+            color: white;
+        }
+
+        .nav-tab-icon {
+            margin-right: 10px;
+        }
+
+        /* Main content */
+        .main-content {
+            flex: 1;
+            padding: 40px;
+            overflow-y: auto;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .module-header {
+            margin-bottom: 30px;
+        }
+
+        .module-title {
+            font-size: 24px;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .module-description {
+            color: #666;
+            font-size: 14px;
+        }
+
+        /* Form styles */
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            font-size: 14px;
+        }
+
+        .form-input, .form-select, .form-textarea {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 14px;
+            background: white;
+        }
+
+        .form-textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+
+        /* Button styles - all black, no gradients */
+        .btn {
+            background: #000;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: opacity 0.2s;
+            margin-right: 10px;
+            margin-bottom: 10px;
+        }
+
+        .btn:hover {
+            opacity: 0.8;
+        }
+
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .btn-secondary {
+            background: #6c757d;
+        }
+
+        /* Status messages */
+        .status {
+            padding: 12px;
+            border-radius: 6px;
+            margin: 10px 0;
+            font-size: 14px;
+        }
+
+        .status.info {
+            background: #d1ecf1;
+            color: #0c5460;
+            border: 1px solid #bee5eb;
+        }
+
+        .status.success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .status.error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        /* Provider cards */
+        .provider-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin: 20px 0;
+        }
+
+        .provider-card {
+            border: 1px solid #e9ecef;
+            border-radius: 6px;
+            padding: 15px;
+            background: white;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .provider-card:hover {
+            border-color: #000;
+        }
+
+        .provider-card.selected {
+            border-color: #000;
+            background: #f8f9fa;
+        }
+
+        .provider-name {
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+
+        .provider-description {
+            font-size: 12px;
+            color: #666;
+        }
+
+        /* Results */
+        .result-box {
+            background: #f8f9fa;
+            border: 1px solid #e9ecef;
+            border-radius: 6px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+
+        .result-title {
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+
+        /* Chat interface */
+        .chat-container {
+            max-height: 400px;
+            overflow-y: auto;
+            border: 1px solid #e9ecef;
+            border-radius: 6px;
+            padding: 20px;
+            background: #f8f9fa;
+        }
+
+        .chat-message {
+            margin-bottom: 15px;
+            display: flex;
+            align-items: flex-start;
+        }
+
+        .chat-avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            margin-right: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+        }
+
+        .user-avatar {
+            background: #007bff;
+            color: white;
+        }
+
+        .ai-avatar {
+            background: #28a745;
+            color: white;
+        }
+
+        .chat-content {
+            flex: 1;
+            background: white;
+            padding: 10px 15px;
+            border-radius: 8px;
+            border: 1px solid #e9ecef;
+        }
+
+        .recording-indicator {
+            display: inline-block;
+            width: 12px;
+            height: 12px;
+            background: #dc3545;
+            border-radius: 50%;
+            margin-left: 8px;
+            animation: pulse 1s infinite;
+        }
+
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.5; }
+            100% { opacity: 1; }
+        }
+
+        .audio-player {
+            width: 100%;
+            margin: 10px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Sidebar -->
+        <div class="sidebar">
+            <div class="logo">
+                <h1>Tamil Voice Gateway</h1>
+            </div>
+            <ul class="nav-tabs">
+                <li class="nav-tab active" onclick="showTab('home')">
+                    <span class="nav-tab-icon">🏠</span>Home
+                </li>
+                <li class="nav-tab" onclick="showTab('listen')">
+                    <span class="nav-tab-icon">👂</span>Listen
+                </li>
+                <li class="nav-tab" onclick="showTab('speak')">
+                    <span class="nav-tab-icon">🗣️</span>Speak
+                </li>
+                <li class="nav-tab" onclick="showTab('vaanga-pesalam')">
+                    <span class="nav-tab-icon">💬</span>Vaanga Pesalam
+                </li>
+            </ul>
+        </div>
+
+        <!-- Main Content -->
+        <div class="main-content">
+            <!-- Home Tab -->
+            <div id="home" class="tab-content active">
+                <div class="module-header">
+                    <h2 class="module-title">Welcome to Tamil Voice Gateway</h2>
+                    <p class="module-description">Authenticate to access the voice processing modules</p>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">JWT Token</label>
+                    <input type="text" id="jwtToken" class="form-input" placeholder="Enter your JWT token or generate one">
+                </div>
+
+                <div class="form-group">
+                    <button onclick="generateToken()" class="btn">Generate Token</button>
+                    <button onclick="validateToken()" class="btn">Validate Token</button>
+                </div>
+
+                <div id="tokenStatus"></div>
+
+                <div class="result-box" style="display: none;" id="tokenInfo">
+                    <div class="result-title">Token Information</div>
+                    <div id="tokenDetails"></div>
+                </div>
+            </div>
+
+            <!-- Listen Tab -->
+            <div id="listen" class="tab-content">
+                <div class="module-header">
+                    <h2 class="module-title">Listen Module</h2>
+                    <p class="module-description">Convert speech to text with translation</p>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Speech-to-Text Provider</label>
+                    <div class="provider-grid">
+                        <div class="provider-card selected" data-provider="sarvam" onclick="selectSTTProvider('sarvam')">
+                            <div class="provider-name">Sarvam AI</div>
+                            <div class="provider-description">Optimized for Indian languages</div>
+                        </div>
+                        <div class="provider-card" data-provider="google" onclick="selectSTTProvider('google')">
+                            <div class="provider-name">Google Cloud STT</div>
+                            <div class="provider-description">High accuracy, global languages</div>
+                        </div>
+                        <div class="provider-card" data-provider="elevenlabs" onclick="selectSTTProvider('elevenlabs')">
+                            <div class="provider-name">ElevenLabs STT</div>
+                            <div class="provider-description">Advanced AI speech recognition</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <button id="recordBtn" onclick="toggleRecording()" class="btn">🎤 Start Recording</button>
+                    <span id="recordingStatus"></span>
+                </div>
+
+                <div id="listenStatus"></div>
+
+                <div class="result-box" style="display: none;" id="transcriptResult">
+                    <div class="result-title">Transcription Results</div>
+                    <div id="transcriptContent"></div>
+                </div>
+            </div>
+
+            <!-- Speak Tab -->
+            <div id="speak" class="tab-content">
+                <div class="module-header">
+                    <h2 class="module-title">Speak Module</h2>
+                    <p class="module-description">Convert text to speech with translation</p>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Text-to-Speech Provider</label>
+                    <div class="provider-grid">
+                        <div class="provider-card selected" data-provider="elevenlabs" onclick="selectTTSProvider('elevenlabs')">
+                            <div class="provider-name">ElevenLabs</div>
+                            <div class="provider-description">High-quality AI voices</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Text to Speak</label>
+                    <textarea id="speakText" class="form-textarea" placeholder="Enter text to convert to speech"></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Target Language</label>
+                    <select id="speakLanguage" class="form-select">
+                        <option value="ta">Tamil</option>
+                        <option value="en">English</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Voice Speed</label>
+                    <input type="range" id="speakSpeed" min="0.5" max="2.0" step="0.1" value="1.0" class="form-input">
+                    <span id="speedValue">1.0x</span>
+                </div>
+
+                <div class="form-group">
+                    <button onclick="generateSpeech()" class="btn">🎵 Generate Speech</button>
+                    <button onclick="clearSpeakResults()" class="btn btn-secondary">Clear</button>
+                </div>
+
+                <div id="speakStatus"></div>
+
+                <div class="result-box" style="display: none;" id="speakResult">
+                    <div class="result-title">Generated Audio</div>
+                    <audio id="audioPlayer" class="audio-player" controls style="display: none;"></audio>
+                </div>
+            </div>
+
+            <!-- Vaanga Pesalam Tab -->
+            <div id="vaanga-pesalam" class="tab-content">
+                <div class="module-header">
+                    <h2 class="module-title">Vaanga Pesalam</h2>
+                    <p class="module-description">Conversational AI in Tamil and English</p>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Speech-to-Text Provider</label>
+                    <div class="provider-grid">
+                        <div class="provider-card selected" data-provider="sarvam" onclick="selectVaangaSTTProvider('sarvam')">
+                            <div class="provider-name">Sarvam AI</div>
+                            <div class="provider-description">Optimized for Indian languages</div>
+                        </div>
+                        <div class="provider-card" data-provider="google" onclick="selectVaangaSTTProvider('google')">
+                            <div class="provider-name">Google Cloud STT</div>
+                            <div class="provider-description">High accuracy, global languages</div>
+                        </div>
+                        <div class="provider-card" data-provider="elevenlabs" onclick="selectVaangaSTTProvider('elevenlabs')">
+                            <div class="provider-name">ElevenLabs STT</div>
+                            <div class="provider-description">Advanced AI speech recognition</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Language Model</label>
+                    <div class="provider-grid">
+                        <div class="provider-card selected" data-provider="gemini" onclick="selectLLMProvider('gemini')">
+                            <div class="provider-name">Google Gemini</div>
+                            <div class="provider-description">Google's latest AI model</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Text-to-Speech Provider</label>
+                    <div class="provider-grid">
+                        <div class="provider-card selected" data-provider="elevenlabs" onclick="selectVaangaTTSProvider('elevenlabs')">
+                            <div class="provider-name">ElevenLabs</div>
+                            <div class="provider-description">High-quality AI voices</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <button id="vaangaRecordBtn" onclick="toggleVaangaRecording()" class="btn">🎤 Start Conversation</button>
+                    <button onclick="clearVaangaChat()" class="btn btn-secondary">Clear Chat</button>
+                </div>
+
+                <div id="vaangaStatus"></div>
+
+                <div class="chat-container" id="chatContainer">
+                    <div class="chat-message">
+                        <div class="chat-avatar ai-avatar">AI</div>
+                        <div class="chat-content">
+                            வணக்கம்! I'm ready to chat with you in Tamil or English. Click "Start Conversation" and speak!
+                        </div>
+                    </div>
+                </div>
+
+                <audio id="vaangaAudioPlayer" class="audio-player" controls style="display: none;"></audio>
+            </div>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>

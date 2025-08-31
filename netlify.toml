@@ -1,0 +1,38 @@
+[build]
+  # This is a Python FastAPI application, but we'll serve the static files
+  publish = "static"
+  command = "echo 'Static files ready for deployment'"
+
+[build.environment]
+  # Environment variables for build process
+  NODE_VERSION = "18"
+  PYTHON_VERSION = "3.9"
+
+[[redirects]]
+  # Redirect all API calls to the backend (you'll need to deploy backend separately)
+  from = "/v1/*"
+  to = "https://your-backend-url.com/v1/:splat"
+  status = 200
+  force = true
+
+[[redirects]]
+  # Serve the main app for all other routes
+  from = "/*"
+  to = "/index.html"
+  status = 200
+
+[dev]
+  # Local development settings
+  command = "python3 -m uvicorn app.main:app --host 0.0.0.0 --port 8005 --reload"
+  port = 8005
+  publish = "static"
+
+# Headers for security
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Frame-Options = "DENY"
+    X-XSS-Protection = "1; mode=block"
+    X-Content-Type-Options = "nosniff"
+    Referrer-Policy = "strict-origin-when-cross-origin"
+    Content-Security-Policy = "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self' https:; media-src 'self' blob:;"

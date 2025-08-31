@@ -14,7 +14,7 @@ class Settings(BaseSettings):
     # Server Configuration
     HOST: str = Field(default="0.0.0.0", description="Server host")
     PORT: int = Field(default=8000, description="Server port")
-    DEBUG: bool = Field(default=True, description="Debug mode")
+    DEBUG: bool = Field(default=False, description="Debug mode")
     
     # Logging Configuration
     LOG_LEVEL: str = Field(default="INFO", description="Logging level")

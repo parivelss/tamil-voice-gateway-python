@@ -3,6 +3,9 @@ let currentTab = 'home';
 let jwtToken = '';
 let isAuthenticated = false;
 
+// API Base URL - Production Railway backend
+const API_BASE_URL = 'https://tamil-voice-gateway-production.up.railway.app';
+
 // Provider selections
 let selectedSTTProvider = 'google';
 let selectedTTSProvider = 'elevenlabs';
@@ -97,7 +100,7 @@ async function generateToken() {
     try {
         showStatus('tokenStatus', 'Generating token...', 'info');
         
-        const response = await fetch('/v1/auth/token', {
+        const response = await fetch(`${API_BASE_URL}/v1/auth/token`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
@@ -139,7 +142,7 @@ async function validateToken() {
     try {
         showStatus('tokenStatus', 'Validating token...', 'info');
         
-        const response = await fetch('/v1/auth/verify', {
+        const response = await fetch(`${API_BASE_URL}/v1/auth/verify`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -228,7 +231,7 @@ async function processRecording() {
         formData.append('language', 'auto');
         formData.append('timestamps', 'false');
 
-        const response = await fetch('/v1/listen', {
+        const response = await fetch(`${API_BASE_URL}/v1/listen`, {
             method: 'POST',
             headers: {
                 'Authorization': `Bearer ${jwtToken}`,
@@ -270,7 +273,7 @@ async function generateSpeech() {
     try {
         showStatus('speakStatus', 'Generating speech...', 'info');
 
-        const response = await fetch('/v1/speak', {
+        const response = await fetch(`${API_BASE_URL}/v1/speak`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -399,7 +402,7 @@ async function processVaangaRecording() {
             try {
                 const base64Audio = reader.result.split(',')[1];
                 
-                const response = await fetch('/v1/vaanga-pesalam', {
+                const response = await fetch(`${API_BASE_URL}/v1/vaanga-pesalam`, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
